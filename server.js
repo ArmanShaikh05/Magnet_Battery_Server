@@ -6,7 +6,6 @@ import cors from "cors"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { ErrorMiddleware } from "./middlewares/error.js"
-import { METHODS } from "http"
 
 const server = express()
 
@@ -24,7 +23,7 @@ server.use(cors({
         methods:["GET","POST","PUT","DELETE"],
         credentials:true
     }))
-
+    
 server.use(express.urlencoded({extended:true}))
 server.use(express.json())
 server.use('/uploads',express.static(__dirname + '/uploads'))
