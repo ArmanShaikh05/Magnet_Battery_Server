@@ -1,3 +1,4 @@
+import { Inverter } from "../Models/inverterModel.js";
 import { Product } from "../Models/productModel.js";
 import uploadOnCloudinary from "../middlewares/cloudinary.js";
 import ErrorHandler from "../middlewares/error.js";
@@ -220,6 +221,69 @@ export const getSingleItemData = async (req, res, next) => {
         success:false,
         message: error.message
       })
+      next(new ErrorHandler(error.message, 500));
+    }
+  };
+
+
+
+  export const showCombineData = async (req, res, next) => {
+    const search = req.query.search ? req.query.search : "";
+    const brand = req.query.brand ? req.query.brand : "";
+    const category = req.query.category ? req.query.category : "";
+  
+  
+    let baseQuery = {};
+  
+    if (search) {
+      baseQuery = {
+        $or: [
+          {
+            name: {
+              $regex: search,
+              $options: "i",
+            },
+          },
+          {
+            vehicles: {
+              $regex: search,
+              $options: "i",
+            },
+          },
+        ],
+      };
+  
+    }
+  
+    if (brand)
+      baseQuery.brand = {
+        $regex: brand,
+        $options: "i",
+      };
+  
+    if (category)
+      baseQuery.category = {
+        $regex: category,
+        $options: "i",
+      };
+  
+  
+    try {
+      const postsData = await Product.find(baseQuery);
+      const inverterData = await Inverter.find(baseQuery);
+
+      const totalData = []
+      totalData.push(postsData)
+      totalData.push(inverterData)
+  
+      if (!postsData && !postsData) return next(new ErrorHandler("No Product Found", 404));
+  
+      res.json(totalData);
+    } catch (error) {
+      res.json({
+        success: false,
+        message: error.message,
+      });
       next(new ErrorHandler(error.message, 500));
     }
   };
